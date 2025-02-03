@@ -12,6 +12,9 @@ public class island_noise_generator
         float offsetX = rand.Next(-100000, 100000);
         float offsetY = rand.Next(-100000, 100000);
 
+
+
+
         for(int x = 0; x < widht; x++)
         {
             for(int y = 0; y < height; y++)

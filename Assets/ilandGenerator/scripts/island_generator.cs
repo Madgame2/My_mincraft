@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using NaughtyAttributes;
+using Unity.VisualScripting;
 
 public class island_generator : MonoBehaviour
 {
@@ -21,6 +22,7 @@ public class island_generator : MonoBehaviour
     [Space(10)]
     [Header("prefabs and debugs")]
     [SerializeField] private GameObject block;
+    public Material blockMaterial;
     [SerializeField] private Texture2D debug_texture;
     [SerializeField] private Material Debug_materila;
 
@@ -66,7 +68,8 @@ public class island_generator : MonoBehaviour
     {
         Transform isalnd = root.transform.Find("island");
 
-        for(int x =0; x < map.GetLength(0); x++)
+
+        for (int x =0; x < map.GetLength(0); x++)
         {
             for(int y =0; y < map.GetLength(1); y++)
             {
@@ -77,10 +80,57 @@ public class island_generator : MonoBehaviour
                     GameObject cube = Instantiate(block);
                     cube.transform.parent = isalnd;
 
+
                     cube.transform.position = new Vector3(x, i, y);
                 }
             }
         }
+
+        combine_meshs();
+    }
+
+    private void combine_meshs()
+    {
+        GameObject core_object = root.transform.Find("island").gameObject;
+
+        List<MeshFilter> childs_meshs = new List<MeshFilter>(core_object.GetComponentsInChildren<MeshFilter>());
+
+        MeshFilter parent_mash_filter = core_object.GetComponent<MeshFilter>();
+        if(parent_mash_filter == null)
+        {
+            parent_mash_filter = core_object.AddComponent<MeshFilter>();// = gameObject.AddComponent<MeshFilter>();
+        }
+
+        CombineInstance[] combine = new CombineInstance[childs_meshs.Count];
+
+
+        int index = 0;
+
+        foreach(MeshFilter child in childs_meshs)
+        {
+            combine[index].mesh = child.sharedMesh;
+            combine[index].transform = child.transform.localToWorldMatrix;
+
+            child.gameObject.SetActive(false);
+            index++;
+        }
+
+        Mesh combineMash = new Mesh();
+
+        combineMash.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
+        combineMash.CombineMeshes(combine,mergeSubMeshes:true,useMatrices:true);
+
+
+        parent_mash_filter.mesh = combineMash;
+
+
+        MeshRenderer renderer = root.GetComponent<MeshRenderer>();
+        if(renderer == null)
+        {
+            renderer = core_object.AddComponent<MeshRenderer>();
+        }
+
+        renderer.material = block.GetComponent<Renderer>().sharedMaterial;
     }
 
     private void Start()
@@ -108,7 +158,8 @@ public class island_generator : MonoBehaviour
         return debug_texture;
     }
 
-    private void generate_base_isalnd(float[,] map)
+
+    private void addCubeMesh(Vector3 position, List<Vector3> vertices, List<int> triangles, ref int vertexIndex)
     {
 
     }

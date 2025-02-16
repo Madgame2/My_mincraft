@@ -15,6 +15,7 @@ public class island_noise_generator
 
 
 
+
         for(int x = 0; x < widht; x++)
         {
             for(int y = 0; y < height; y++)

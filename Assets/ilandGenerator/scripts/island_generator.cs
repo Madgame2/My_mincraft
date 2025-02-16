@@ -4,15 +4,8 @@ using UnityEngine;
 using NaughtyAttributes;
 using Unity.VisualScripting;
 
-public class island_generator : MonoBehaviour
+public class island_generator //: MonoBehaviour
 {
-    [Header("island params")]
-    [SerializeField] private int Widht;
-    [SerializeField] private int Depth;
-    [SerializeField] private float scale;
-    [SerializeField] private float radius;
-    [SerializeField] private float edgeFalloff;
-    [SerializeField] private int seed;
 
     [Space(10)]
     [Header("generation parmas")]
@@ -22,51 +15,10 @@ public class island_generator : MonoBehaviour
     [Space(10)]
     [Header("prefabs and debugs")]
     [SerializeField] private GameObject block;
-    public Material blockMaterial;
     [SerializeField] private Texture2D debug_texture;
-    [SerializeField] private Material Debug_materila;
 
-    [Button("Generaate")]
-    public void generate_isalnd()
-    {
-        island_info island = new island_info();
-        island.width = Widht;
-        island.height = Depth;
-        island.scale = scale;
-        island.islandRadius = radius;
-        island.edgeFalloff = edgeFalloff;
-        island.seed = seed;
-
-        float[,] island_map = island_noise_generatin_v_2.generate_noise(island); //island_noise_generator.generate_noise_map(Widht, Depth, scale, center_scale, 42);
-
-        debug_texture = generateTexture(island_map);
-        Debug_materila.mainTexture = debug_texture;
-
-        Renderer render = GetComponent<Renderer>();
-        if (render != null)
-        {
-            render.material.mainTexture = debug_texture;
-        }
-
-        generate_base_struct();
-        generate_base_island(island_map);
-    }
-
-    private void generate_base_struct()
-    {
-        if (root != null)
-        {
-            DestroyImmediate(root);
-        }
-
-        root = new GameObject("map");
-        GameObject island = new GameObject("island");
-
-        island.transform.parent = root.transform;
-    }
     private void generate_base_island(float[,] map)
     {
-        Transform isalnd = root.transform.Find("island");
 
 
         for (int x =0; x < map.GetLength(0); x++)
@@ -77,16 +29,14 @@ public class island_generator : MonoBehaviour
 
                 for(int i = 0; i < height; i++)
                 {
-                    GameObject cube = Instantiate(block);
-                    cube.transform.parent = isalnd;
+                    //GameObject cube = Instantiate(block);
+                    //cube.transform.parent = isalnd;
 
 
-                    cube.transform.position = new Vector3(x, i, y);
+                    //cube.transform.position = new Vector3(x, i, y);
                 }
             }
         }
-
-        combine_meshs();
     }
 
     private void combine_meshs()
@@ -133,34 +83,57 @@ public class island_generator : MonoBehaviour
         renderer.material = block.GetComponent<Renderer>().sharedMaterial;
     }
 
-    private void Start()
-    {
-        generate_isalnd();
-    }
 
-    private Texture2D generateTexture(float[,] noise_map)
+    public IEnumerable<(int,int, Chank)> generate_chanks(float[,] map)
     {
-        int widht = noise_map.GetLength(0);
-        int height = noise_map.GetLength(1);
-        Texture2D debug_texture = new Texture2D(widht, height);
+        Vector3Int chankSize = Chank.getChankSize();
 
-        for(int x = 0; x < widht; x++)
+        int x_iterations = map.GetLength(0)/chankSize.x;
+        if (map.GetLength(0) % chankSize.x != 0)
         {
-            for(int y = 0; y < height; y++)
+            x_iterations++;
+        }
+
+        int z_iterations = map.GetLength(1) / chankSize.z;
+        if (map.GetLength(1) % chankSize.z != 0)
+        {
+            z_iterations++;
+        }
+
+        for(int i = 0; i < x_iterations; i++)
+        {
+            for(int j =0;j< z_iterations; j++)
             {
-                float value = noise_map[x, y];
-                Color color = new Color(value, value, value);
-                debug_texture.SetPixel(x, y, color);
+                Vector2Int startPoint = new Vector2Int(i*chankSize.x, j*chankSize.z);
+
+                yield return (i,j,buildChank(map, startPoint));
             }
         }
 
-        debug_texture.Apply();
-        return debug_texture;
+        yield break;
     }
 
 
-    private void addCubeMesh(Vector3 position, List<Vector3> vertices, List<int> triangles, ref int vertexIndex)
+    private Chank buildChank(float[,] map, Vector2Int start_point) 
     {
+        Vector3Int chankSize = Chank.getChankSize(); 
 
+        Chank newChank = new Chank();
+        for(int local_x = 0; local_x < chankSize.x; local_x++)
+        {
+            for(int local_z = 0;local_z < chankSize.z; local_z++)
+            {
+                Vector2Int globalIndex = new Vector2Int(local_x+start_point.x,local_z+start_point.y);
+                int height = (int)(map[globalIndex.x, globalIndex.y] * map_scale);
+
+
+                for(int local_y = 0; local_y < height; local_y++)
+                {
+                    newChank[local_x, local_y, local_z] = 1;
+                }
+            }
+        }
+
+        return newChank;
     }
 }

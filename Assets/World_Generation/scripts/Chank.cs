@@ -17,32 +17,10 @@ public class Chank
 
     public Mesh mesh { get; private set; }
 
-    private List<Vector3> vertices;
-    private List<Vector2> uvs;
-    private List<int> triangles;
-
-    private static readonly Dictionary<FaceType, Vector3[]> faceVertexOffsets = new Dictionary<FaceType, Vector3[]>()
-    {
-        { FaceType.Front, new Vector3[] { new Vector3(0,0,1), new Vector3(1,0,1), new Vector3(1,1,1), new Vector3(0,1,1) } },
-        { FaceType.Back,  new Vector3[] { new Vector3(1,0,0), new Vector3(0,0,0), new Vector3(0,1,0), new Vector3(1,1,0) } },
-        { FaceType.Up,    new Vector3[] { new Vector3(0,1,1), new Vector3(1,1,1), new Vector3(1,1,0), new Vector3(0,1,0) } },
-        { FaceType.Down,  new Vector3[] { new Vector3(0,0,0), new Vector3(1,0,0), new Vector3(1,0,1), new Vector3(0,0,1) } },
-        { FaceType.Right, new Vector3[] { new Vector3(1,0,1), new Vector3(1,0,0), new Vector3(1,1,0), new Vector3(1,1,1) } },
-        { FaceType.Left,  new Vector3[] { new Vector3(0,0,0), new Vector3(0,0,1), new Vector3(0,1,1), new Vector3(0,1,0) } }
-    };
-
-    // Шаблон треугольников для грани (индексы относительно 4 вершин)
-    private static readonly int[] faceTriangles = new int[] { 0, 2, 1, 0, 3, 2 };
-
-    // Стандартные UV-координаты для грани
-    private static readonly Vector2[] faceUVs = new Vector2[]
-    {
-        new Vector2(0,0), new Vector2(1,0), new Vector2(1,1), new Vector2(0,1)
-    };
-
     public Chank()
     {
-        if (widht == null || height == null || depth == null) {
+        if (widht == null || height == null || depth == null)
+        {
             throw new InvalidDataException("chaks demension is not defined");
         }
 
@@ -52,10 +30,11 @@ public class Chank
 
     public ref int this[int x, int y, int z]
     {
-        get { 
+        get
+        {
             return ref blocks[get_index(x, y, z)];
-        }    
-     }
+        }
+    }
 
     public ref int this[Vector3Int block_position]
     {
@@ -65,9 +44,9 @@ public class Chank
         }
     }
 
-    public static void set_chank_size(int x, int y,int z)
+    public static void set_chank_size(int x, int y, int z)
     {
-        widht=x; height=y; depth=z;
+        widht = x; height = y; depth = z;
     }
     public static void set_chank_size(Vector3Int size)
     {
@@ -76,13 +55,14 @@ public class Chank
         depth = size.z;
     }
 
-    private int get_index(int x,int y,int z)
+    private int get_index(int x, int y, int z)
     {
-        return x + widht.Value * (z + depth.Value * y);
+        return x + widht.Value * (y + height.Value * z);
     }
+
     private int get_index(Vector3Int position)
     {
-        return position.x + widht.Value * (position.z + depth.Value * position.y);
+        return position.x + widht.Value * (position.y + height.Value * position.z);
     }
 
 
@@ -91,7 +71,8 @@ public class Chank
         return new Vector3Int(widht.Value, height.Value, depth.Value);
     }
 
-    public void set_position(Vector2Int position) {
+    public void set_position(Vector2Int position)
+    {
 
         this.postiont = position;
     }
@@ -106,24 +87,89 @@ public class Chank
         if (nx < 0 || nx >= widht || ny < 0 || ny >= height || nz < 0 || nz >= depth)
             return true;
 
-        return get_index(nx, ny, nz) == 0;
+        Vector3Int curent = new Vector3Int(nx, ny, nz);
+        int curentBclok = this[curent];
+
+        return curentBclok == 0;
     }
 
-    //private void addFace(Vector3 blockPos,FaceType faceType)
-    //{
-    //    int vCount = vertices.Count;
-    //    Vector3[] offsets = faceVertexOffsets[faceType];
+    public void generateMesh(Blocks_manager bloks)
+    {
 
-    //    for (int i = 0; i < offsets.Length; i++)
-    //    {
-    //        vertices.Add(blockPos+offsets[i]);
-    //    }
+        List<CombineInstance> combineInstances = new List<CombineInstance>();
 
-    //    for(int i =0;i< faceTriangles.Length; i++)
-    //    {
-    //        triangles.Add(vCount + faceTriangles[i]);
-    //    }
 
-    //    uvs.AddRange(faceUVs);
-    //}
+
+        for (int x = 0; x < widht.Value; x++)
+        {
+            for (int y = 0; y < height.Value; y++)
+            {
+                for (int z = 0; z < depth.Value; z++)
+                {
+                    Vector3Int curent = new Vector3Int(x, y, z);
+                    int curentBclok = this[curent];
+
+
+                    if (curentBclok != 0)
+                    {
+
+                        Vector3 pos = new Vector3(x, y, z);
+
+                        if (IsFaceExposed(pos, Vector3.forward))
+                        {
+                            CombineInstance newCombine = new CombineInstance();
+                            newCombine.mesh = bloks[0].Forward;
+                            newCombine.transform = Matrix4x4.TRS(pos, Quaternion.identity, Vector3.one);
+                            combineInstances.Add(newCombine);
+                        }
+
+                        if (IsFaceExposed(pos, Vector3.back))
+                        {
+                            CombineInstance newCombine = new CombineInstance();
+                            newCombine.mesh = bloks[0].Backward;
+                            newCombine.transform = Matrix4x4.TRS(pos, Quaternion.identity, Vector3.one);
+                            combineInstances.Add(newCombine);
+                        }
+
+                        if (IsFaceExposed(pos, Vector3.left))
+                        {
+                            CombineInstance newCombine = new CombineInstance();
+                            newCombine.mesh = bloks[0].Left;
+                            newCombine.transform = Matrix4x4.TRS(pos, Quaternion.identity, Vector3.one);
+                            combineInstances.Add(newCombine);
+                        }
+
+                        if (IsFaceExposed(pos, Vector3.right))
+                        {
+                            CombineInstance newCombine = new CombineInstance();
+                            newCombine.mesh = bloks[0].Right;
+                            newCombine.transform = Matrix4x4.TRS(pos, Quaternion.identity, Vector3.one);
+                            combineInstances.Add(newCombine);
+                        }
+
+                        if (IsFaceExposed(pos, Vector3.up))
+                        {
+                            CombineInstance newCombine = new CombineInstance();
+                            newCombine.mesh = bloks[0].Up;
+                            newCombine.transform = Matrix4x4.TRS(pos, Quaternion.identity, Vector3.one);
+                            combineInstances.Add(newCombine);
+                        }
+
+                        if (IsFaceExposed(pos, Vector3.down))
+                        {
+                            CombineInstance newCombine = new CombineInstance();
+                            newCombine.mesh = bloks[0].Down;
+                            newCombine.transform = Matrix4x4.TRS(pos, Quaternion.identity, Vector3.one);
+                            combineInstances.Add(newCombine);
+                        }
+                    }
+                }
+            }
+        }
+
+        mesh = new Mesh();
+        mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
+        mesh.CombineMeshes(combineInstances.ToArray());
+
+    }
 }

@@ -7,12 +7,19 @@ using Unity.VisualScripting;
 [ExecuteInEditMode]
 public class Block : MonoBehaviour
 {
-    [SerializeField] Mesh Up;
-    [SerializeField] Mesh Down;
-    [SerializeField] Mesh Left;
-    [SerializeField] Mesh Right;
-    [SerializeField] Mesh Forward;
-    [SerializeField] Mesh Backward;
+    [SerializeField] private Mesh up;
+    [SerializeField] private Mesh down;
+    [SerializeField] private Mesh left;
+    [SerializeField] private Mesh right;
+    [SerializeField] private Mesh forward;
+    [SerializeField] private Mesh backward;
+
+    public Mesh Up => up;
+    public Mesh Down => down;
+    public Mesh Left => left;
+    public Mesh Right => right;
+    public Mesh Forward => forward;
+    public Mesh Backward => backward;
 
     private MeshFilter meshFilter;
     private MeshRenderer meshRenderer;

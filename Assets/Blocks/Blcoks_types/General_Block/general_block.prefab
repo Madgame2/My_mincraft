@@ -47,12 +47,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eccbcff0ba5bb3d4e900ca0296dd209a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Up: {fileID: 4300000, guid: 6ce83128f054b5a46b36ba7a0c5243e8, type: 2}
-  Down: {fileID: 4300000, guid: f13235cd3ec443d4cb72327f79dd501c, type: 2}
-  Left: {fileID: 4300000, guid: c596475096f05e441b439c27a3f275d1, type: 2}
-  Right: {fileID: 4300000, guid: dde28dd1a682a7c4b8c49d6da8490a90, type: 2}
-  Forward: {fileID: 4300000, guid: 72c53a253ab781c46b54aee01d276985, type: 2}
-  Backward: {fileID: 4300000, guid: 4efc3511f2b14824b9465f574c0371f3, type: 2}
+  up: {fileID: 4300000, guid: 6ce83128f054b5a46b36ba7a0c5243e8, type: 2}
+  down: {fileID: 4300000, guid: f13235cd3ec443d4cb72327f79dd501c, type: 2}
+  left: {fileID: 4300000, guid: c596475096f05e441b439c27a3f275d1, type: 2}
+  right: {fileID: 4300000, guid: dde28dd1a682a7c4b8c49d6da8490a90, type: 2}
+  forward: {fileID: 4300000, guid: 72c53a253ab781c46b54aee01d276985, type: 2}
+  backward: {fileID: 4300000, guid: 4efc3511f2b14824b9465f574c0371f3, type: 2}
 --- !u!33 &8919342902004283342
 MeshFilter:
   m_ObjectHideFlags: 0

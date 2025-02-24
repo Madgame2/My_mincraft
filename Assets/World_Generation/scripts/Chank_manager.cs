@@ -24,13 +24,16 @@ public class Chank_manager : MonoBehaviour
     [SerializeField] private float scale;
     [SerializeField] private float radius;
     [SerializeField] private float edgeFalloff;
+    [SerializeField] private int map_scale = 10;
     [SerializeField] private int seed;
 
     [Space(10)]
     [Header("prefabs and debugs")]
     [SerializeField] private GameObject block;
     [SerializeField] private Material debug_texture;
+    [SerializeField] private Material debug_matterial;
     [SerializeField] private GameObject islandRoot;
+
 
     [Button("Generate")]
     private void debug_start()
@@ -53,13 +56,13 @@ public class Chank_manager : MonoBehaviour
 
         generateBaseStruct();
 
-        foreach (var (x,y, curent) in islandGen.generate_chanks(island_noise))
+        foreach (var (x,y, curent) in islandGen.generate_chanks(island_noise, map_scale))
         {
             Vector2Int position = new Vector2Int(x,y);
             chanks.Add(position, curent);
-            //curent.generateMesh(block);
+            curent.generateMesh(GetComponent<Blocks_manager>());
 
-            //Generate_chank(chanks[position], position);
+            Generate_chank(chanks[position], position);
         }
 
     }
@@ -98,27 +101,9 @@ public class Chank_manager : MonoBehaviour
         ChankRoot.AddComponent<MeshRenderer>();
 
         ChankRoot.GetComponent<MeshFilter>().mesh = chank.mesh;
+        ChankRoot.GetComponent<MeshRenderer>().material = debug_matterial;
 
-        //Vector3Int chankSize = Chank.getChankSize();
-        //for(int x = 0; x < chankSize.x; x++)
-        //{
-        //    for(int z =0;z<chankSize.z; z++)
-        //    {
-        //        for(int y =0;y<chankSize.y; y++)
-        //        {
-        //            Vector3Int curent = new Vector3Int(x,y,z);
-        //            int curentBclok = chank[curent];
-
-
-        //            if (curentBclok != 0)
-        //            {
-        //                GameObject newBlcok = Instantiate(block);
-        //                newBlcok.transform.parent = ChankRoot.transform;
-        //                newBlcok.transform.position = curent;
-        //            }
-        //        }
-        //    }
-        //}
+        ChankRoot.AddComponent<MeshCollider>();
 
         ChankRoot.transform.position = new Vector3(postion.x*Chank.getChankSize().x,0,postion.y*Chank.getChankSize().z);
         ChankRoot.transform.parent = islandRoot.transform;

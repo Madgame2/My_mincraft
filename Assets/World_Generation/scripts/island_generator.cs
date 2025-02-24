@@ -7,84 +7,9 @@ using Unity.VisualScripting;
 public class island_generator //: MonoBehaviour
 {
 
-    [Space(10)]
-    [Header("generation parmas")]
-    [SerializeField] private int map_scale = 10;
-    [SerializeField] private GameObject root;
+    
 
-    [Space(10)]
-    [Header("prefabs and debugs")]
-    [SerializeField] private GameObject block;
-    [SerializeField] private Texture2D debug_texture;
-
-    private void generate_base_island(float[,] map)
-    {
-
-
-        for (int x =0; x < map.GetLength(0); x++)
-        {
-            for(int y =0; y < map.GetLength(1); y++)
-            {
-                int height = (int)(map[x, y] * map_scale);
-
-                for(int i = 0; i < height; i++)
-                {
-                    //GameObject cube = Instantiate(block);
-                    //cube.transform.parent = isalnd;
-
-
-                    //cube.transform.position = new Vector3(x, i, y);
-                }
-            }
-        }
-    }
-
-    private void combine_meshs()
-    {
-        GameObject core_object = root.transform.Find("island").gameObject;
-
-        List<MeshFilter> childs_meshs = new List<MeshFilter>(core_object.GetComponentsInChildren<MeshFilter>());
-
-        MeshFilter parent_mash_filter = core_object.GetComponent<MeshFilter>();
-        if(parent_mash_filter == null)
-        {
-            parent_mash_filter = core_object.AddComponent<MeshFilter>();// = gameObject.AddComponent<MeshFilter>();
-        }
-
-        CombineInstance[] combine = new CombineInstance[childs_meshs.Count];
-
-
-        int index = 0;
-
-        foreach(MeshFilter child in childs_meshs)
-        {
-            combine[index].mesh = child.sharedMesh;
-            combine[index].transform = child.transform.localToWorldMatrix;
-
-            child.gameObject.SetActive(false);
-            index++;
-        }
-
-        Mesh combineMash = new Mesh();
-
-        combineMash.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
-        combineMash.CombineMeshes(combine,mergeSubMeshes:true,useMatrices:true);
-
-
-        parent_mash_filter.mesh = combineMash;
-
-
-        MeshRenderer renderer = root.GetComponent<MeshRenderer>();
-        if(renderer == null)
-        {
-            renderer = core_object.AddComponent<MeshRenderer>();
-        }
-
-        renderer.material = block.GetComponent<Renderer>().sharedMaterial;
-    }
-
-
-    public IEnumerable<(int,int, Chank)> generate_chanks(float[,] map)
+    public IEnumerable<(int,int, Chank)> generate_chanks(float[,] map,int map_scale)
     {
         Vector3Int chankSize = Chank.getChankSize();
 
@@ -106,7 +31,7 @@ public class island_generator //: MonoBehaviour
             {
                 Vector2Int startPoint = new Vector2Int(i*chankSize.x, j*chankSize.z);
 
-                yield return (i,j,buildChank(map, startPoint));
+                yield return (i,j,buildChank(map, startPoint, map_scale));
             }
         }
 
@@ -114,7 +39,7 @@ public class island_generator //: MonoBehaviour
     }
 
 
-    private Chank buildChank(float[,] map, Vector2Int start_point) 
+    private Chank buildChank(float[,] map, Vector2Int start_point, int map_scale) 
     {
         Vector3Int chankSize = Chank.getChankSize(); 
 

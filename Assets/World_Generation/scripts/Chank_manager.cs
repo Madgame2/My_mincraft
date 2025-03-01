@@ -5,10 +5,11 @@ using System.IO;
 using NaughtyAttributes;
 using System.CodeDom.Compiler;
 using UnityEngine.UIElements;
+using UnityEditor.PackageManager;
 
 public class Chank_manager : MonoBehaviour
 {
-    [SerializeField] private Dictionary<Vector2,Chank> chanks = new Dictionary<Vector2,Chank>();
+    static private Dictionary<Vector2Int,Chank> chanks = new Dictionary<Vector2Int,Chank>();
 
     [Header("Chanks params")]
     [SerializeField] private int chank_width;
@@ -29,9 +30,7 @@ public class Chank_manager : MonoBehaviour
 
     [Space(10)]
     [Header("prefabs and debugs")]
-    [SerializeField] private GameObject block;
     [SerializeField] private Material debug_texture;
-    [SerializeField] private Material debug_matterial;
     [SerializeField] private GameObject islandRoot;
 
 
@@ -60,9 +59,15 @@ public class Chank_manager : MonoBehaviour
         {
             Vector2Int position = new Vector2Int(x,y);
             chanks.Add(position, curent);
-            curent.generateMesh(GetComponent<Blocks_manager>());
+            
 
-            Generate_chank(chanks[position], position);
+           
+        }
+
+        foreach(var chank in chanks)
+        {
+            chank.Value.generateMesh(GetComponent<Blocks_manager>());
+            Generate_chank(chanks[chank.Key], chank.Key);
         }
 
     }
@@ -101,7 +106,7 @@ public class Chank_manager : MonoBehaviour
         ChankRoot.AddComponent<MeshRenderer>();
 
         ChankRoot.GetComponent<MeshFilter>().mesh = chank.mesh;
-        ChankRoot.GetComponent<MeshRenderer>().material = debug_matterial;
+        ChankRoot.GetComponent<MeshRenderer>().material = chank.get_Materials[chank.mesh];
 
         ChankRoot.AddComponent<MeshCollider>();
 
@@ -110,6 +115,15 @@ public class Chank_manager : MonoBehaviour
     }
 
 
+
+    public static Chank get_chank(Vector2Int pos)
+    {
+        if(chanks.ContainsKey(pos))
+        {
+            return chanks[pos];
+        }
+        return null;
+    }
 
     //DEBUG
     public static void ApplyTexture(Material material, float[,] data)

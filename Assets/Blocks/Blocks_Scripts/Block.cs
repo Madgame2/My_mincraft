@@ -13,6 +13,7 @@ public class Block : MonoBehaviour
     [SerializeField] private Mesh right;
     [SerializeField] private Mesh forward;
     [SerializeField] private Mesh backward;
+    [SerializeField] private Material material;
 
     public Mesh Up => up;
     public Mesh Down => down;
@@ -20,6 +21,8 @@ public class Block : MonoBehaviour
     public Mesh Right => right;
     public Mesh Forward => forward;
     public Mesh Backward => backward;
+
+    public Material Material => material;
 
     private MeshFilter meshFilter;
     private MeshRenderer meshRenderer;
@@ -71,6 +74,8 @@ public class Block : MonoBehaviour
         if (!meshRenderer) meshRenderer = GetComponent<MeshRenderer>();
         if (!meshRenderer) meshRenderer = gameObject.AddComponent<MeshRenderer>();
 
+        if (material != null) GetComponent<MeshRenderer>().material = material;
+       
         if (!GetComponent<MeshCollider>()) this.AddComponent<MeshCollider>();
 
         // Перерисовываем сцену в Edit Mode

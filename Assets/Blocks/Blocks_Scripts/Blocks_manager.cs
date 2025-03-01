@@ -27,8 +27,6 @@ public class Blocks_manager : MonoBehaviour
             blocks_array[index] = block;
             index++;
         }
-
-        Debug.Log(blocks_array);
     }
 
     private void OnValidate()
@@ -48,8 +46,6 @@ public class Blocks_manager : MonoBehaviour
             blocks_array[index] = block;
             index++;
         }
-
-        Debug.Log(this[0]);
     }
 
     public Block this[int index]{

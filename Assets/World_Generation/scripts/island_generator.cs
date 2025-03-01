@@ -30,8 +30,9 @@ public class island_generator //: MonoBehaviour
             for(int j =0;j< z_iterations; j++)
             {
                 Vector2Int startPoint = new Vector2Int(i*chankSize.x, j*chankSize.z);
+                Chank new_chank = new Chank(i,j);
 
-                yield return (i,j,buildChank(map, startPoint, map_scale));
+                yield return (i,j,buildChank(map, startPoint, map_scale, new_chank));
             }
         }
 
@@ -39,11 +40,10 @@ public class island_generator //: MonoBehaviour
     }
 
 
-    private Chank buildChank(float[,] map, Vector2Int start_point, int map_scale) 
+    private Chank buildChank(float[,] map, Vector2Int start_point, int map_scale, Chank newChank) 
     {
         Vector3Int chankSize = Chank.getChankSize(); 
 
-        Chank newChank = new Chank();
         for(int local_x = 0; local_x < chankSize.x; local_x++)
         {
             for(int local_z = 0;local_z < chankSize.z; local_z++)

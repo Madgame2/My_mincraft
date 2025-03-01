@@ -16,8 +16,11 @@ public class Chank
     public Vector2Int postiont { get; private set; }
 
     public Mesh mesh { get; private set; }
+    private Dictionary<Mesh,Material> Materials = new Dictionary<Mesh,Material>();
 
-    public Chank()
+
+    public Dictionary<Mesh, Material> get_Materials => Materials;
+    public Chank(int x, int y)
     {
         if (widht == null || height == null || depth == null)
         {
@@ -26,6 +29,8 @@ public class Chank
 
         blocks = new int[widht.Value * height.Value * depth.Value];
 
+
+        postiont=  new Vector2Int(x,y);
     }
 
     public ref int this[int x, int y, int z]
@@ -85,7 +90,51 @@ public class Chank
         int nz = (int)blockPos.z + (int)faceDir.z;
 
         if (nx < 0 || nx >= widht || ny < 0 || ny >= height || nz < 0 || nz >= depth)
-            return true;
+        {
+
+            if (ny < 0 || ny >= height)
+            {
+                return false;
+            }
+
+            Vector2Int neighboring_chank_position = new Vector2Int(postiont.x,postiont.y);
+            Vector3Int Block_pos = new Vector3Int(nx,ny,nz);
+
+            if (nx < 0) { 
+                neighboring_chank_position.x = postiont.x-1;
+                Block_pos.x = widht.Value - 1;
+            }else if (nx>=widht)
+            {
+                neighboring_chank_position.x = postiont.x + 1;
+                Block_pos.x = 0;
+            }
+
+            if (nz < 0)
+            {
+                neighboring_chank_position.y = postiont.y - 1;
+                Block_pos.z = depth.Value - 1;
+            }
+            else if (nz >= depth)
+            {
+                neighboring_chank_position.y = postiont.y + 1;
+                Block_pos.z = 0;
+            }
+
+            Chank neighbor_chank = Chank_manager.get_chank(neighboring_chank_position);
+
+
+            if (neighbor_chank == null)
+            {
+                return true;   
+            }
+
+            //Debug.Log(Block_pos);
+
+            int curentBlock = neighbor_chank[Block_pos];
+
+            return curentBlock==0;
+
+        }
 
         Vector3Int curent = new Vector3Int(nx, ny, nz);
         int curentBclok = this[curent];
@@ -171,5 +220,6 @@ public class Chank
         mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
         mesh.CombineMeshes(combineInstances.ToArray());
 
+        Materials[mesh] = bloks[0].Material;
     }
 }

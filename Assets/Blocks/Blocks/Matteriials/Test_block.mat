@@ -132,6 +132,7 @@ Material:
     - _Parallax: 0.02
     - _QueueControl: 0
     - _QueueOffset: 0
+    - _Radius: 10
     - _ReceiveShadows: 1
     - _Smoothness: 0
     - _SmoothnessTextureChannel: 0
@@ -144,9 +145,11 @@ Material:
     m_Colors:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 0}
     - _Base_color: {r: 1, g: 1, b: 1, a: 0}
+    - _Camera_position: {r: 70.47333, g: 17.262405, b: 60.397186, a: 0}
     - _Color: {r: 1, g: 1, b: 1, a: 0}
     - _EmissionColor: {r: 1, g: 1, b: 1, a: 1}
     - _Emission_Color: {r: 0, g: 0, b: 0, a: 1}
+    - _Player_position: {r: 87.32154, g: 6.5, b: 58.774887, a: 0}
     - _SpecColor: {r: 0.19999993, g: 0.19999993, b: 0.19999993, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

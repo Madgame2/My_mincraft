@@ -111,6 +111,7 @@ public class Chank_manager : MonoBehaviour
         ChankRoot.AddComponent<MeshCollider>();
 
         ChankRoot.transform.position = new Vector3(postion.x*Chank.getChankSize().x,0,postion.y*Chank.getChankSize().z);
+        ChankRoot.transform.position += new Vector3(0.5f, 0.5f, 0.5f);
         ChankRoot.transform.parent = islandRoot.transform;
     }
 

@@ -8,11 +8,11 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] float jumpForce;
     [SerializeField] float gravityMultiplier = 3f;
 
-    private Transform camera_transsform;
     private bool isGrouded = true;
 
     Rigidbody rb;
     Collider player_collider;
+    [SerializeField] TherdPersonCamera _CameraManager;
 
     private void Start()
     {
@@ -25,7 +25,7 @@ public class PlayerMovement : MonoBehaviour
         float MoveX = Input.GetAxisRaw("Horizontal");
         float MoveZ = Input.GetAxisRaw("Vertical");
 
-        Quaternion rotationY = Quaternion.Euler(0, camera_transsform.eulerAngles.y, 0);
+        Quaternion rotationY = Quaternion.Euler(0, _CameraManager.cameraTransfrom.eulerAngles.y, 0);
 
         direction = rotationY * (new Vector3(MoveX, 0, MoveZ)).normalized;
 
@@ -63,12 +63,6 @@ public class PlayerMovement : MonoBehaviour
         {
             rb.AddForce(Vector3.down * gravityMultiplier, ForceMode.Acceleration);
         }
-    }
-
-
-    public void set_camera_rotated(Transform camera)
-    {
-        this.camera_transsform = camera;
     }
 
     private bool WillCollide(Vector3 offset)

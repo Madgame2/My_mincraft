@@ -1,6 +1,8 @@
 using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.UIElements;
 
 public class TherdPersonCamera : MonoBehaviour
 {
@@ -11,12 +13,16 @@ public class TherdPersonCamera : MonoBehaviour
     [SerializeField] Camera _Camera; 
     [SerializeField] KeyCode enableRotate_key;
 
-    [SerializeField] public  UnityEvent<Transform> Camera_transform; 
 
     private float yaw = -20.0f; // Горизонтальный угол
     private float pitch = 20.0f; // Вертикальный угол
 
+    [SerializeField] private UnityEvent<bool> change_rotation_mode;
 
+    public Transform cameraTransfrom
+    {
+        get { return _Camera.transform; }
+    }
 
     private void LateUpdate()
     {
@@ -27,8 +33,15 @@ public class TherdPersonCamera : MonoBehaviour
             yaw += Input.GetAxis("Mouse X") * sensitivity;
             pitch -= Input.GetAxis("Mouse Y") * sensitivity;
             pitch = Mathf.Clamp(pitch, minYAngle, maxYAngle); // Ограничение угла
+        }
 
-            Camera_transform?.Invoke(_Camera.transform);
+        if (Input.GetKeyDown(enableRotate_key))
+        {
+            change_rotation_mode?.Invoke(true);
+        }
+        else if (Input.GetKeyUp(enableRotate_key))
+        {
+            change_rotation_mode?.Invoke(false);
         }
 
 
@@ -38,5 +51,6 @@ public class TherdPersonCamera : MonoBehaviour
 
 
         transform.LookAt(target.position);
+
     }
 }

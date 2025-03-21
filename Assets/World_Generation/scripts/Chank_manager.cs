@@ -144,6 +144,9 @@ public class Chank_manager : MonoBehaviour
 
 
         chanksObjects.Add(postion, ChankRoot);
+
+        ChankRoot.isStatic = true;
+
         //Debug.Log(chanksObjects.Count);
     }
 

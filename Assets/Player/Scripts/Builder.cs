@@ -30,12 +30,14 @@ public class Builder : MonoBehaviour
         
         Vector3 chankSize = Chank.getChankSize();
 
-        Vector2Int chankPos = new Vector2Int((int)(block_globalPos.x / chankSize.x), (int)(block_globalPos.z / chankSize.z));
+        Vector3 newBlockPos = block_globalPos + normal;
+        Vector2Int chankPos = new Vector2Int((int)(newBlockPos.x / chankSize.x), (int)(newBlockPos.z / chankSize.z));
+        Debug.Log(chankPos);
 
 
         active_chunk = Chank_manager.get_chank(chankPos);
         localBlockPos = getLockalPost(block_globalPos);
-
+        Debug.Log(localBlockPos);
 
 
 
@@ -59,11 +61,16 @@ public class Builder : MonoBehaviour
                                         (int)(localBlockPos.y + Normal.y),
                                         (int)(localBlockPos.z + Normal.z));
 
+
+        Vector3 chankSize = Chank.getChankSize();
+
+        if (pos.x < 0) pos.x += (int)chankSize.x;
+        else if (pos.x > chankSize.x) pos.x -= (int)chankSize.x;
+
+        if (pos.z < 0) pos.z += (int)chankSize.z;
+        else if (pos.z > chankSize.z) pos.z -= (int)chankSize.z;
+
         active_chunk.addBlock(pos, 1);
-
-        //GameObject newObject = Instantiate(debugObject);
-
-        //newObject.transform.position = debugGlobalPos+Normal;
     }
 
     public void undoSelection()
@@ -95,4 +102,7 @@ public class Builder : MonoBehaviour
     {
         transform.rotation = Quaternion.FromToRotation(Vector3.up, normal);
     }
+
+
+   
 }

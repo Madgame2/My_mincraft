@@ -18,6 +18,7 @@ public class Chank
     public Mesh mesh { get; private set; }
     private Dictionary<Mesh,Material> Materials = new Dictionary<Mesh,Material>();
 
+    public event Action<Vector2Int,Mesh> meshsUpdated;
 
     public Dictionary<Mesh, Material> get_Materials => Materials;
     public Chank(int x, int y)
@@ -142,7 +143,7 @@ public class Chank
         return curentBclok == 0;
     }
 
-    public void generateMesh(Blocks_manager bloks)
+    public void generateMesh()
     {
 
         List<CombineInstance> combineInstances = new List<CombineInstance>();
@@ -167,7 +168,7 @@ public class Chank
                         if (IsFaceExposed(pos, Vector3.forward))
                         {
                             CombineInstance newCombine = new CombineInstance();
-                            newCombine.mesh = bloks[0].Forward;
+                            newCombine.mesh = Blocks_manager.getBlock(0).Forward;
                             newCombine.transform = Matrix4x4.TRS(pos, Quaternion.identity, Vector3.one);
                             combineInstances.Add(newCombine);
                         }
@@ -175,7 +176,7 @@ public class Chank
                         if (IsFaceExposed(pos, Vector3.back))
                         {
                             CombineInstance newCombine = new CombineInstance();
-                            newCombine.mesh = bloks[0].Backward;
+                            newCombine.mesh = Blocks_manager.getBlock(0).Backward;
                             newCombine.transform = Matrix4x4.TRS(pos, Quaternion.identity, Vector3.one);
                             combineInstances.Add(newCombine);
                         }
@@ -183,7 +184,7 @@ public class Chank
                         if (IsFaceExposed(pos, Vector3.left))
                         {
                             CombineInstance newCombine = new CombineInstance();
-                            newCombine.mesh = bloks[0].Left;
+                            newCombine.mesh = Blocks_manager.getBlock(0).Left;
                             newCombine.transform = Matrix4x4.TRS(pos, Quaternion.identity, Vector3.one);
                             combineInstances.Add(newCombine);
                         }
@@ -191,7 +192,7 @@ public class Chank
                         if (IsFaceExposed(pos, Vector3.right))
                         {
                             CombineInstance newCombine = new CombineInstance();
-                            newCombine.mesh = bloks[0].Right;
+                            newCombine.mesh = Blocks_manager.getBlock(0).Right;
                             newCombine.transform = Matrix4x4.TRS(pos, Quaternion.identity, Vector3.one);
                             combineInstances.Add(newCombine);
                         }
@@ -199,7 +200,7 @@ public class Chank
                         if (IsFaceExposed(pos, Vector3.up))
                         {
                             CombineInstance newCombine = new CombineInstance();
-                            newCombine.mesh = bloks[0].Up;
+                            newCombine.mesh = Blocks_manager.getBlock(0).Up;
                             newCombine.transform = Matrix4x4.TRS(pos, Quaternion.identity, Vector3.one);
                             combineInstances.Add(newCombine);
                         }
@@ -207,7 +208,7 @@ public class Chank
                         if (IsFaceExposed(pos, Vector3.down))
                         {
                             CombineInstance newCombine = new CombineInstance();
-                            newCombine.mesh = bloks[0].Down;
+                            newCombine.mesh = Blocks_manager.getBlock(0).Down;
                             newCombine.transform = Matrix4x4.TRS(pos, Quaternion.identity, Vector3.one);
                             combineInstances.Add(newCombine);
                         }
@@ -220,6 +221,22 @@ public class Chank
         mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
         mesh.CombineMeshes(combineInstances.ToArray());
 
-        Materials[mesh] = bloks[0].Material;
+        Materials[mesh] = Blocks_manager.getBlock(0).Material;
+    }
+
+
+    public void addBlock(Vector3Int pos, int blockID)
+    {
+        if (this[pos] != 0)
+        {
+            throw new Exception($"Block already exist: chank{this}, pos: {pos}, block_id: {blockID}");
+        }
+
+        this[pos] = blockID;
+
+        generateMesh();
+
+
+        meshsUpdated?.Invoke(postiont, mesh);
     }
 }

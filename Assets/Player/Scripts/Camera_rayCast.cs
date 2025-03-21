@@ -12,8 +12,11 @@ public class Camera_rayCast : MonoBehaviour
     [SerializeField] private LineRenderer lineRendererCameraRay;  // Линия от камеры
     [SerializeField] private LineRenderer lineRendererPlayerRay;   // Линия от игрока
     [SerializeField] private UnityEvent<Vector3,Vector3> selectBlock;
+    [SerializeField] private UnityEvent undoSelection;
+    [SerializeField] private LayerMask ignoreLayer;
 
-    private Vector3Int CurentPosition;
+    private Vector3Int CurrentPosition;
+    private Vector3 CurrentNoraml;
     private bool is_active;
     void Start()
     {
@@ -41,42 +44,67 @@ public class Camera_rayCast : MonoBehaviour
             lineRendererCameraRay.SetPosition(0, _Camera.transform.position);
             lineRendererCameraRay.SetPosition(1, _Camera.transform.position + ray_camera_postitoin.direction * 100);
 
-            if (Physics.Raycast(ray_camera_postitoin, out RaycastHit hit))
+            if (Physics.Raycast(ray_camera_postitoin, out RaycastHit hit, Mathf.Infinity, ~ignoreLayer))
             {
 
-
-                // Отображаем линию от игрока до точки пересечения луча
                 Vector3 direction = hit.point - transform.position;
                 ray_player_position = new Ray(transform.position, direction);
 
                 lineRendererPlayerRay.SetPosition(0, transform.position);
                 lineRendererPlayerRay.SetPosition(1, hit.point);
 
-                if (direction.magnitude<= arm_leght)
+                if (direction.magnitude <= arm_leght)
                 {
-                    Vector3 buffer = new Vector3Int((int)hit.point.x, (int)hit.point.y, (int)hit.point.z);
-                    if (CurentPosition != buffer)
+                    Vector3 hitPoint = hit.point;
+
+
+                    if (hit.normal.y > 0.5f) hitPoint.y -= 0.001f;
+                    if (hit.normal.y < -0.5f) hitPoint.y += 0.001f;
+
+                    if (hit.normal.x > 0.5f) hitPoint.x -= 0.001f;
+                    if (hit.normal.x < -0.5f) hitPoint.x += 0.001f;
+
+                    if (hit.normal.z > 0.5f) hitPoint.z -= 0.001f;
+                    if (hit.normal.z < -0.5f) hitPoint.z += 0.001f;
+
+                    Vector3Int buffer = new Vector3Int(
+                        Mathf.FloorToInt(hitPoint.x + 0.5f),
+                        Mathf.RoundToInt(hitPoint.y),
+                        Mathf.FloorToInt(hitPoint.z + 0.5f)
+                    );
+
+                   // Debug.Log(hit.point + $"buffer: {buffer} Normal {hit.normal}");
+
+                    if (CurrentPosition != buffer|| hit.normal!= CurrentNoraml)
                     {
-                        CurentPosition = new Vector3Int((int)hit.point.x, (int)hit.point.y, (int)hit.point.z);
-                        Debug.Log($"selected this position: {hit.point}");
-                        selectBlock?.Invoke(hit.point, hit.normal);
+                        CurrentPosition = buffer;
+                        CurrentNoraml = hit.normal;
+                        selectBlock?.Invoke(CurrentPosition, hit.normal);
                     }
+                }
+                else
+                {
+                    undoSelection?.Invoke();
                 }
             }
             else
             {
+                if (CurrentPosition != default) {
+                    CurrentPosition = default;
+                    CurrentNoraml = default;
+                    undoSelection?.Invoke();
+                }
+
                 ray_player_position = new Ray(transform.position, ray_camera_postitoin.direction);
 
-                lineRendererPlayerRay.SetPosition(0, ray_player_position.origin); // Начало луча
+                lineRendererPlayerRay.SetPosition(0, ray_player_position.origin); 
                 lineRendererPlayerRay.SetPosition(1, ray_player_position.origin + ray_player_position.direction * 100);
             }
-            //Debug.Log(is_active);
         }
     }
 
     public void setActiveMode(bool active)
     {
-        //Debug.Log($"setActiveMode вызван с {active}, is_active теперь {active}. Вызван из: " + new System.Diagnostics.StackTrace());
         is_active = !active;
     }
 }

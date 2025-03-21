@@ -145,11 +145,11 @@ Material:
     m_Colors:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 0}
     - _Base_color: {r: 1, g: 1, b: 1, a: 0}
-    - _Camera_position: {r: 92.33367, g: 11.440039, b: 52.602207, a: 0}
+    - _Camera_position: {r: 103.951065, g: 20.920979, b: 74.936745, a: 0}
     - _Color: {r: 1, g: 1, b: 1, a: 0}
     - _EmissionColor: {r: 1, g: 1, b: 1, a: 1}
     - _Emission_Color: {r: 0, g: 0, b: 0, a: 1}
-    - _Player_position: {r: 89.1011, g: 8, b: 61.483646, a: 0}
+    - _Player_position: {r: 103.71598, g: 12.5, b: 80.43176, a: 0}
     - _SpecColor: {r: 0.19999993, g: 0.19999993, b: 0.19999993, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

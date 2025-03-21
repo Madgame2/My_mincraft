@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.Rendering;
+using System;
 
 [ExecuteInEditMode]
 public class Blocks_manager : MonoBehaviour
@@ -9,7 +10,7 @@ public class Blocks_manager : MonoBehaviour
     [SerializeField] List<Block> generalBlocks;
     [SerializeField] List<Block> special_objects;
 
-    private Block[] blocks_array;
+    private static Block[] blocks_array;
     private int general_end;
 
     private void Start()
@@ -48,7 +49,9 @@ public class Blocks_manager : MonoBehaviour
         }
     }
 
-    public Block this[int index]{
-        get => blocks_array[index];    
+    public static Block getBlock(int index){
+        if (blocks_array[index] == null) throw new Exception($"Blocks array doesnt exist this index {index}");
+
+        return blocks_array[index];
     }
 }

@@ -6,17 +6,20 @@ using NaughtyAttributes;
 using System.CodeDom.Compiler;
 using UnityEngine.UIElements;
 using UnityEditor.PackageManager;
+using System.Linq;
 
 public class Chank_manager : MonoBehaviour
 {
     static private Dictionary<Vector2Int,Chank> chanks = new Dictionary<Vector2Int,Chank>();
+    static private Dictionary<Vector2Int, GameObject> chanksObjects = new Dictionary<Vector2Int, GameObject>();
+
+    private island_generator islandGen = new island_generator();
+
 
     [Header("Chanks params")]
     [SerializeField] private int chank_width;
     [SerializeField] private int chank_Height;
     [SerializeField] private int chank_depth;
-
-    private island_generator islandGen = new island_generator();
 
     [Space(10)]
     [Header("island params")]
@@ -59,17 +62,17 @@ public class Chank_manager : MonoBehaviour
         {
             Vector2Int position = new Vector2Int(x,y);
             chanks.Add(position, curent);
-            
 
-           
+            curent.meshsUpdated += updateChunk;
         }
 
         foreach(var chank in chanks)
         {
-            chank.Value.generateMesh(GetComponent<Blocks_manager>());
+            chank.Value.generateMesh();
             Generate_chank(chanks[chank.Key], chank.Key);
         }
 
+        
     }
 
 
@@ -84,7 +87,33 @@ public class Chank_manager : MonoBehaviour
     {
         Chank.set_chank_size(chank_width,chank_Height,chank_depth);
 
+        island_info island = new island_info();
+        island.width = Widht;
+        island.height = Depth;
+        island.scale = scale;
+        island.islandRadius = radius;
+        island.edgeFalloff = edgeFalloff;
+        island.seed = seed;
 
+        float[,] island_noise = island_noise_generatin_v_2.generate_noise(island);
+
+        foreach (var (x, y, curent) in islandGen.generate_chanks(island_noise, map_scale))
+        {
+            Vector2Int position = new Vector2Int(x, y);
+            chanks.Add(position, curent);
+
+            curent.meshsUpdated += updateChunk;
+        }
+
+        generateBaseStruct();
+
+            foreach (var chank in chanks)
+            {
+                chank.Value.generateMesh();
+                Generate_chank(chanks[chank.Key], chank.Key);
+            }
+
+        Debug.Log(chanksObjects.Count);
     }
 
     private void generateBaseStruct()
@@ -111,11 +140,12 @@ public class Chank_manager : MonoBehaviour
         ChankRoot.AddComponent<MeshCollider>();
 
         ChankRoot.transform.position = new Vector3(postion.x*Chank.getChankSize().x,0,postion.y*Chank.getChankSize().z);
-        ChankRoot.transform.position += new Vector3(0.5f, 0.5f, 0.5f);
         ChankRoot.transform.parent = islandRoot.transform;
+
+
+        chanksObjects.Add(postion, ChankRoot);
+        //Debug.Log(chanksObjects.Count);
     }
-
-
 
     public static Chank get_chank(Vector2Int pos)
     {
@@ -124,6 +154,15 @@ public class Chank_manager : MonoBehaviour
             return chanks[pos];
         }
         return null;
+    }
+
+
+    public void updateChunk(Vector2Int pos , Mesh newMesh)
+    {
+        GameObject chank = chanksObjects[pos];
+
+        chank.GetComponent<MeshCollider>().sharedMesh = newMesh;
+        chank.GetComponent<MeshFilter>().mesh = newMesh;
     }
 
     //DEBUG
